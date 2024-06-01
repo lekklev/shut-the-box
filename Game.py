@@ -19,34 +19,85 @@ class Box():
     This class represents a box in shut the box.
     """
     def __init__(self, n_tiles=9):
+        """
+        This function initializes the box.
+
+        Attributes:
+        :param n_tiles: number of tiles in the box
+        :type n_tiles: int
+        :param tile_array: array of tiles in the box
+        :type tile_array: np.array[int]
+        :param status_array: array of status of tiles in the box; either 0 or 1; 0 means unflipped and 1 means flipped
+        :type status_array: np.array[int]
+        :param n_states: number of states in the box
+        :type n_states: int
+        :param max_flips: maximum number of tiles that can be flipped in a turn
+        :type max_flips: int
+        :param reward: reward for the box
+        :type reward: int
+        """
         self.n_tiles=n_tiles
         self.tile_array = np.arange(1, n_tiles + 1) # Shut the box starts at 1 and ends at n (usually 9)
         self.status_array = np.zeros(n_tiles)
         self.n_states = 2 ** self.n_tiles
         self.max_flips = 2
+        # TODO: incorporate reward
+        self.reward = -np.sum(self.tile_array)
         #TODO: how to visualise dice combinations?
 
     def flip(self, tile):
+        """
+        This function flips a tile in the box.
+        
+        Attributes:
+        :param tile: value of tile to be flipped
+        :type tile: int
+        :rtype: None
+        """ 
+        #TODO: what if we want to flip multiple tiles?
         tile_idx = self.tile_array.index(tile)
         self.status_array[tile_idx] = 1
+        self.reward += tile
 
     def reset(self):
+        """
+        This function resets the box.
+        """
         self.status_array = np.zeros(self.n_tiles)
 
     def terminated(self):
-        # If all tiles are closed or there are no more options --> env.terminated();
-        # TODO: implement legal actions
-        return np.array_equal(np.status_array, np.ones_like(self.tile_array))
+        if np.array_equal(np.status_array, np.ones_like(self.tile_array)):
+            return True
             
     def unflipped_tiles(self):
         # Return what the values of tiles are not flipped yet
         return self.tile_array[self.status_array == 0]
 
     def legal_actions(self, value):
+        """
+        This function returns the legal actions for a given value.
+        
+        Attributes:
+        :param value: value of dice throw
+        :type value: int
+        :rtype: list[list[int]]
+        """
         unflipped_tiles = unflipped_tiles(self)
         results = []
 
         def backtrack(start, current_partition, current_sum):
+            """
+            This backtracking function finds all possible partitions of a given value.
+
+            Attributes:
+            :param start: starting index for partition
+            :type start: int
+            :param current_partition: current partition
+            :type current_partition: list[int]
+            :param current_sum: current sum of partition
+            :type current_sum: int
+            :rtype: None
+            """
             # Base case: If the partition sum equals n and length is within the limit
             if current_sum == value and len(current_partition) <= self.max_flips:
                 results.append(current_partition[:])
