@@ -36,7 +36,7 @@ class Box():
     def terminated(self):
         # If all tiles are closed or there are no more options --> env.terminated();
         # TODO: implement legal actions
-        return np.array_equal(np.status_array, np.ones_like(self.tile_array)):
+        return np.array_equal(np.status_array, np.ones_like(self.tile_array))
             
     def unflipped_tiles(self):
         # Return what the values of tiles are not flipped yet
